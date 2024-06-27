@@ -9,3 +9,18 @@ Design and implement “Word of Wisdom” tcp server.
 • After Proof Of Work verification, server should send one of the quotes from “word of wisdom” book or any other collection of the quotes.
 
 • Docker file should be provided both for the server and for the client that solves the POW challenge
+
+---
+## Challenge–response protocols
+
+1. Client send request: "request"
+2. Server challenge: "challenge|challenge_string:difficulty"
+3. Client response with solution: "response|{{hashcash}}"
+4. Server
+   5. grant: "granted|{{payload}}"
+   6. or error: "error|{{error}}"
+   7. or ignore
+
+## TODO
+1. server graceful shutdown
+2. 

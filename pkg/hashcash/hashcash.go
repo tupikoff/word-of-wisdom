@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/tupikoff/word-of-wisdom/pkg/random"
 )
 
 type hashCash struct {
@@ -25,16 +24,15 @@ type hashCash struct {
 	counter int // internal counter
 }
 
-func New(resource string) *hashCash {
-	r := random.String(15)
+func New(resource, challenge string, difficulty int) *hashCash {
 	c := rand.New(rand.NewSource(time.Now().UnixNano())).Int()
 	hc := &hashCash{
 		Ver:      1,
-		Bits:     20,
-		Date:     time.Now().Format("200601020304"),
+		Bits:     difficulty,
+		Date:     time.Now().Format("0601021504"),
 		Resource: resource,
 		Ext:      "",
-		Rand:     base64.StdEncoding.EncodeToString([]byte(r)),
+		Rand:     base64.StdEncoding.EncodeToString([]byte(challenge)),
 		Counter:  base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(c))),
 		counter:  c,
 	}
@@ -71,16 +69,20 @@ func (h *hashCash) String() string {
 		h.Ver, h.Bits, h.Date, h.Resource, h.Ext, h.Rand, h.Counter)
 }
 
+func (h *hashCash) Hash() hash {
+	return sha1.Sum([]byte(h.String()))
+}
+
+func (h *hashCash) IsHashValid() bool {
+	return h.Hash().IsValid(h.Bits)
+}
+
 func (h *hashCash) calculate() {
 	for {
-		if h.Hash().IsValid() {
+		if h.IsHashValid() {
 			return
 		}
 		h.counter++
 		h.Counter = base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(h.counter)))
 	}
-}
-
-func (h *hashCash) Hash() hash {
-	return sha1.Sum([]byte(h.String()))
 }

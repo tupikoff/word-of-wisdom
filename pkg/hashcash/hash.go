@@ -1,16 +1,18 @@
 package hashcash
 
-import "encoding/hex"
+import (
+	"encoding/hex"
+)
 
 type hash [20]byte
 
-func (h hash) IsValid() bool {
-	if h[0] == 0 &&
-		h[1] == 0 &&
-		h[2] <= 15 {
-		return true
+func (h hash) IsValid(zeroBitNum int) bool {
+	for i := range zeroBitNum {
+		if h[i] != 0 {
+			return false
+		}
 	}
-	return false
+	return true
 }
 
 func (h hash) String() string {
