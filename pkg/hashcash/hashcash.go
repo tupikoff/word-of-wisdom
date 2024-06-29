@@ -4,7 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
-	"math/rand"
+	mathRand "math/rand"
 	"strconv"
 	"strings"
 	"time"
@@ -24,15 +24,15 @@ type hashCash struct {
 	counter int // internal counter
 }
 
-func New(resource, challenge string, difficulty int) *hashCash {
-	c := rand.New(rand.NewSource(time.Now().UnixNano())).Int()
+func New(resource, rand string, bits int) *hashCash {
+	c := mathRand.New(mathRand.NewSource(time.Now().UnixNano())).Int()
 	hc := &hashCash{
 		Ver:      1,
-		Bits:     difficulty,
+		Bits:     bits,
 		Date:     time.Now().Format("0601021504"),
 		Resource: resource,
 		Ext:      "",
-		Rand:     base64.StdEncoding.EncodeToString([]byte(challenge)),
+		Rand:     base64.StdEncoding.EncodeToString([]byte(rand)),
 		Counter:  base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(c))),
 		counter:  c,
 	}

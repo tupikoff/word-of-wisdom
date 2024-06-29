@@ -16,10 +16,8 @@ Design and implement “Word of Wisdom” tcp server.
 1. Client send request: "request"
 2. Server challenge: "challenge|challenge_string:difficulty"
 3. Client response with solution: "response|{{hashcash}}"
-4. Server
-   5. grant: "granted|{{payload}}"
-   6. or error: "error|{{error}}"
-   7. or ignore
+4. Server grant: "granted|{{payload}}"
+or ignore
 
 ## TODO
 1. server graceful shutdown

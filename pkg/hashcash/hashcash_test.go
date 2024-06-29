@@ -8,7 +8,9 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	hc1 := New("192.168.0.1", random.String(15), 2)
+	challenge := random.String(15)
+	difficulty := 20
+	hc1 := New("192.168.0.1", challenge, difficulty)
 	assert.True(t, hc1.IsHashValid())
 
 	t.Log(hc1.String())

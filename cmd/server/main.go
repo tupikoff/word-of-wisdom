@@ -3,38 +3,25 @@ package main
 import (
 	"context"
 	"log"
-	"net"
 
-	"github.com/tupikoff/word-of-wisdom/internal/server"
+	"github.com/tupikoff/word-of-wisdom/internal/server/delivery"
+	"github.com/tupikoff/word-of-wisdom/internal/server/infrastructure"
+	"github.com/tupikoff/word-of-wisdom/internal/server/usecase"
 )
 
-func main() {
-	port := ":8080"
+const defaultPort = 8080
+const defaultProtocol = "tcp4"
 
+func main() {
 	ctx := context.Background()
 
-	l, err := net.Listen("tcp", port)
+	wordsRepository := infrastructure.NewBibleVersesRepository()
+	registerRepository := infrastructure.NewRegisterInMemoryRepository()
+	protocolService := usecase.NewProtocolService(wordsRepository, registerRepository)
+	server := delivery.NewServer(defaultProtocol, defaultPort, protocolService)
+	err := server.Start(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer func(l net.Listener) {
-		err = l.Close()
-		if err != nil {
-			log.Printf("Error closing listener: %v", err)
-		}
-	}(l)
-
-	log.Printf("Listening on port %s", port)
-
-	for {
-		conn, err := l.Accept()
-		if err != nil {
-			log.Printf("Error accepting connection: %v", err)
-			return
-		}
-		connection := server.NewConnection(conn)
-		go connection.Handle(ctx)
-	}
-
 	// TODO graceful shutdown? (OoS = Out of Scope)
 }
