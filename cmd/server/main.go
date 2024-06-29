@@ -19,9 +19,9 @@ func main() {
 	registerRepository := infrastructure.NewRegisterInMemoryRepository()
 	protocolService := usecase.NewProtocolService(wordsRepository, registerRepository)
 	server := delivery.NewServer(defaultProtocol, defaultPort, protocolService)
+
 	err := server.Start(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// TODO graceful shutdown? (OoS = Out of Scope)
 }

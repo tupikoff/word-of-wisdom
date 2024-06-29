@@ -27,25 +27,10 @@ func (r *RegisterInMemoryRepository) Save(
 
 	_, ok := r.storage[registerRecord.HashString]
 	if ok {
-		return domain.ErrAlreadyExists
+		return domain.ErrRecordAlreadyExists
 	}
 
 	r.storage[registerRecord.HashString] = registerRecord
 
 	return nil
-}
-
-func (r *RegisterInMemoryRepository) Get(
-	ctx context.Context,
-	hashString string,
-) (*domain.RegisterRecord, error) {
-	r.mutex.RLock()
-	defer r.mutex.RUnlock()
-
-	record, ok := r.storage[hashString]
-	if !ok {
-		return nil, domain.ErrHashStringNotRegistered
-	}
-
-	return &record, nil
 }

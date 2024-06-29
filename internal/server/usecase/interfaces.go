@@ -15,8 +15,4 @@ type registerRepository interface {
 		ctx context.Context,
 		registerRecord domain.RegisterRecord,
 	) error
-	Get(
-		ctx context.Context,
-		hashString string,
-	) (*domain.RegisterRecord, error)
 }

@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"encoding/base64"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultDifficulty            = 20
+	defaultDifficulty            = 22
 	defaultChallengeStringLength = 30
 )
 
@@ -38,18 +38,7 @@ func (c ProtocolService) Execute(
 
 	switch requestData[0] {
 	case "request":
-		randString := random.String(defaultChallengeStringLength)
-		record := domain.RegisterRecord{
-			RandString: randString,
-			HashString: base64.StdEncoding.EncodeToString([]byte(randString)),
-			Difficulty: defaultDifficulty,
-		}
-		err := c.registerRepository.Save(ctx, record)
-		if err != nil {
-			return "", err
-		}
-		log.Printf("saved record: %+v", record)
-		response = fmt.Sprintf("challenge|%s:%d", record.RandString, record.Difficulty)
+		response = fmt.Sprintf("challenge|%s", random.String(defaultChallengeStringLength))
 	case "response":
 		if len(requestData) > 1 {
 			solution := requestData[1]
@@ -57,19 +46,25 @@ func (c ProtocolService) Execute(
 			if err != nil {
 				return "", fmt.Errorf("%w: %s", domain.ErrHashReadError, err.Error())
 			}
-
-			rec, err := c.registerRepository.Get(ctx, hc.Rand)
-			if err != nil {
-				return "", err
+			if hc.Bits != defaultDifficulty {
+				return "", domain.ErrDifficultyNotMatch
 			}
-
-			if rec.Difficulty != hc.Bits {
-				return "", domain.ErrDifficultyNotMatchWithRegistered
-			}
-
 			if !hc.IsHashValid() {
 				return "", domain.ErrHashNotValid
 			}
+
+			record := domain.RegisterRecord{
+				HashString: hc.Rand,
+			}
+			err = c.registerRepository.Save(ctx, record)
+			if err != nil {
+				if errors.Is(err, domain.ErrRecordAlreadyExists) {
+					return "", fmt.Errorf("hash was used: %w", err)
+				}
+				return "", err
+			}
+			log.Printf("saved record: %+v", record)
+
 			response = fmt.Sprintf("granted|%s", c.wisdomRepository.Read())
 		}
 	default:
