@@ -25,12 +25,12 @@ func (r *StorageInMemoryRepository) Save(
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	_, ok := r.storage[storageRecord.HashString]
+	_, ok := r.storage[storageRecord.Key]
 	if ok {
 		return domain.ErrRecordAlreadyExists
 	}
 
-	r.storage[storageRecord.HashString] = storageRecord
+	r.storage[storageRecord.Key] = storageRecord
 
 	return nil
 }

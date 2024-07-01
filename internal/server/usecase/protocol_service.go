@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/tupikoff/word-of-wisdom/internal/server/domain"
 	"github.com/tupikoff/word-of-wisdom/pkg/hashcash"
@@ -49,12 +50,13 @@ func (c ProtocolService) Execute(
 	if err != nil {
 		return fmt.Errorf("protocol execute: write: %v", err)
 	}
-
+	startTime := time.Now()
 	// 5. response
 	request, err = connection.Read()
 	if err != nil {
 		return fmt.Errorf("protocol execute: read: %v", err)
 	}
+	duration := time.Since(startTime)
 	requestData = strings.Split(request, "|")
 	if requestData[0] != "response" {
 		return errors.New("protocol execute: expected `response`")
@@ -78,8 +80,8 @@ func (c ProtocolService) Execute(
 		return domain.ErrHashNotValid
 	}
 	record := domain.StorageRecord{
-		HashString: hc.Rand,
-		Difficulty: difficulty,
+		Key:      hc.String(),
+		Duration: duration,
 	}
 	err = c.storageRepository.Save(ctx, record)
 	if err != nil {

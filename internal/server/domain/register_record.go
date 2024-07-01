@@ -1,6 +1,8 @@
 package domain
 
+import "time"
+
 type StorageRecord struct {
-	HashString string
-	Difficulty int
+	Key      string
+	Duration time.Duration
 }
