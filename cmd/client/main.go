@@ -1,15 +1,22 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"time"
 
-	"github.com/tupikoff/word-of-wisdom/pkg/hashcash"
+	"github.com/tupikoff/word-of-wisdom/pkg/client"
 )
 
 func main() {
-	t := time.Now()
-	//fmt.Println(hashcash.New("192.168.0.1", random.String(30), 25).String())
-	fmt.Println(hashcash.New("192.168.0.1", "3PsqoXs4WJVARfEYbZCdVuWTePxtR4", 22).String())
-	fmt.Printf("%.2f sec\n", time.Since(t).Seconds())
+	c := client.New("localhost:8080", "tcp")
+
+	for {
+		wow, err := c.Request()
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("WORDS OF WISDOM: %s", wow)
+
+		time.Sleep(time.Second * 5)
+	}
 }

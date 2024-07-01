@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+
+	"github.com/tupikoff/word-of-wisdom/pkg/tcp"
 )
 
 type Server struct {
@@ -46,7 +48,25 @@ func (s *Server) Start(ctx context.Context) error {
 			log.Printf("Error accepting connection: %v", err)
 			return err
 		}
-		connection := NewConnection(conn, s.protocolService)
-		go connection.Handle(ctx)
+		go s.Handle(ctx, tcp.NewConnection(conn))
+	}
+}
+
+func (s *Server) Handle(ctx context.Context, connection *tcp.Connection) {
+	ip := connection.Conn().RemoteAddr()
+	log.Printf("New connection from %v", ip)
+
+	defer func(connection *tcp.Connection) {
+		err := connection.Close()
+		if err != nil {
+			log.Printf("Error closing connection: %v", err)
+		}
+		log.Printf("Connection closed with %v", ip)
+
+	}(connection)
+
+	err := s.protocolService.Execute(ctx, connection)
+	if err != nil {
+		log.Printf("%v", err)
 	}
 }

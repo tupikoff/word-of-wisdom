@@ -4,12 +4,12 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
-	mathRand "math/rand"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/tupikoff/word-of-wisdom/pkg/random"
 )
 
 type hashCash struct {
@@ -25,15 +25,15 @@ type hashCash struct {
 }
 
 func New(resource, rand string, bits int) *hashCash {
-	c := mathRand.New(mathRand.NewSource(time.Now().UnixNano())).Int()
+	c := random.Int()
 	hc := &hashCash{
 		Ver:      1,
 		Bits:     bits,
 		Date:     time.Now().Format("0601021504"),
 		Resource: resource,
 		Ext:      "",
-		Rand:     base64.StdEncoding.EncodeToString([]byte(rand)),
-		Counter:  base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(c))),
+		Rand:     Hash(rand),
+		Counter:  Hash(strconv.Itoa(c)),
 		counter:  c,
 	}
 	hc.calculate()
@@ -85,4 +85,8 @@ func (h *hashCash) calculate() {
 		h.counter++
 		h.Counter = base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(h.counter)))
 	}
+}
+
+func Hash(s string) string {
+	return base64.StdEncoding.EncodeToString([]byte(s))
 }

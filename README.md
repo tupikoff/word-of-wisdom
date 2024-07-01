@@ -14,11 +14,11 @@ Design and implement “Word of Wisdom” tcp server.
 ## Challenge–response protocols
 
 1. Client send request: "request"
-2. Server challenge: "challenge|challenge_string:difficulty"
+2. Server challenge: "challenge|{{challenge_string}}"
 3. Client response with solution: "response|{{hashcash}}"
 4. Server grant: "granted|{{payload}}"
 or ignore
 
 ## TODO
 1. server graceful shutdown
-2. 
+2. config
