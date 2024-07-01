@@ -16,8 +16,8 @@ func main() {
 	ctx := context.Background()
 
 	wordsRepository := infrastructure.NewBibleVersesRepository()
-	registerRepository := infrastructure.NewRegisterInMemoryRepository()
-	protocolService := usecase.NewProtocolService(wordsRepository, registerRepository)
+	storageRepository := infrastructure.NewStorageInMemoryRepository()
+	protocolService := usecase.NewProtocolService(wordsRepository, storageRepository)
 	server := delivery.NewServer(defaultProtocol, defaultPort, protocolService)
 
 	err := server.Start(ctx)

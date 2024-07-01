@@ -15,15 +15,15 @@ import (
 
 // ProtocolService are Request-Challenge Protocol https://en.wikipedia.org/wiki/Proof_of_work
 type ProtocolService struct {
-	wisdomRepository   wisdomRepository
-	registerRepository registerRepository
+	wisdomRepository  wisdomRepository
+	storageRepository storageRepository
 }
 
 func NewProtocolService(
 	wisdomRepository wisdomRepository,
-	registerRepository registerRepository,
+	storageRepository storageRepository,
 ) *ProtocolService {
-	return &ProtocolService{wisdomRepository: wisdomRepository, registerRepository: registerRepository}
+	return &ProtocolService{wisdomRepository: wisdomRepository, storageRepository: storageRepository}
 }
 
 func (c ProtocolService) Execute(
@@ -77,11 +77,11 @@ func (c ProtocolService) Execute(
 	if !hc.IsHashValid() {
 		return domain.ErrHashNotValid
 	}
-	record := domain.RegisterRecord{
+	record := domain.StorageRecord{
 		HashString: hc.Rand,
 		Difficulty: difficulty,
 	}
-	err = c.registerRepository.Save(ctx, record)
+	err = c.storageRepository.Save(ctx, record)
 	if err != nil {
 		if errors.Is(err, domain.ErrRecordAlreadyExists) {
 			return fmt.Errorf("hash was used: %w", err)

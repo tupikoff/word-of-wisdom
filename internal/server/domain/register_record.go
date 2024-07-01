@@ -1,6 +1,6 @@
 package domain
 
-type RegisterRecord struct {
+type StorageRecord struct {
 	HashString string
 	Difficulty int
 }

@@ -13,10 +13,10 @@ import (
 )
 
 type Client struct {
+	*tcp.Connection
+
 	Address  string
 	Protocol string
-
-	*tcp.Connection
 }
 
 func New(address string, protocol string) *Client {

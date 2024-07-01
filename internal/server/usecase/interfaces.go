@@ -10,9 +10,9 @@ type wisdomRepository interface {
 	Read() string
 }
 
-type registerRepository interface {
+type storageRepository interface {
 	Save(
 		ctx context.Context,
-		registerRecord domain.RegisterRecord,
+		storageRecord domain.StorageRecord,
 	) error
 }
